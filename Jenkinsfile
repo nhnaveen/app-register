@@ -7,8 +7,7 @@ pipeline {
     environment {
 	    APP_NAME = "register-app-pipeline"
             RELEASE = "1.0.0"
-            DOCKER_USER = "ashfaque9x"
-            DOCKER_PASS = 'dockerhub'
+            DOCKER_USER = "paras1112"
             IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
             IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
 	    JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
@@ -22,7 +21,7 @@ pipeline {
 
         stage("Checkout from SCM"){
                 steps {
-                    git branch: 'main', credentialsId: 'github', url: 'https://github.com/Ashfaque-9x/register-app'
+                    git branch: 'main', credentialsId: 'github', url: 'https://github.com/Paras116255/app-register.git'
                 }
         }
 
@@ -61,6 +60,11 @@ pipeline {
         stage("Build & Push Docker Image") {
             steps {
                 script {
+			withCredentials([gitUsernamePassword(credentialsId: 'DOCKER_PASS', gitToolName: 'Default')]) {
+    				docker_image = docker.build "${IMAGE_NAME}"
+				docker_image.push("${IMAGE_TAG}")
+                        	docker_image.push('latest')
+			}
                     docker.withRegistry('',DOCKER_PASS) {
                         docker_image = docker.build "${IMAGE_NAME}"
                     }
